@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>保育日報｜10の姿 × 5領域</title>
+<style>
+/* 帳票としての可読性と印刷結果を優先し、閲覧環境のテーマに関わらず配色を固定する */
+:root, :root[data-theme="dark"], :root[data-theme="light"]{
+  color-scheme: light;
+  --bg:#f6f5f1; --card:#fff; --ink:#22201c; --sub:#6b665d; --line:#ddd8cc;
+  --accent:#2f6f4f; --accent-w:#e6f0ea; --warn:#a8541f; --warn-w:#fbeee2;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Hiragino Sans","Yu Gothic",system-ui,sans-serif;font-size:15px;line-height:1.7}
+header{background:var(--accent);color:#fff;padding:14px 20px}
+header h1{margin:0;font-size:18px;font-weight:700;letter-spacing:.04em}
+header p{margin:2px 0 0;font-size:12px;opacity:.85}
+.tabs{display:flex;gap:2px;background:var(--accent);padding:0 12px}
+.tabs button{border:0;background:rgba(255,255,255,.15);color:#fff;padding:9px 18px;
+  font-size:14px;cursor:pointer;border-radius:8px 8px 0 0;font-family:inherit}
+.tabs button.on{background:var(--bg);color:var(--ink);font-weight:700}
+main{max-width:1000px;margin:0 auto;padding:18px 14px 60px}
+section.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:16px;margin-bottom:14px}
+h2{font-size:15px;margin:0 0 10px;padding-bottom:6px;border-bottom:2px solid var(--accent);
+  display:inline-block}
+h3{font-size:14px;margin:16px 0 6px;color:var(--sub)}
+label{font-size:13px;color:var(--sub);display:block;margin-bottom:3px}
+input[type=text],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;
+  font-family:inherit;font-size:14px;background:#fff;color:var(--ink)}
+textarea{resize:vertical;line-height:1.7}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>div{flex:1;min-width:130px}
+button.btn{background:var(--accent);color:#fff;border:0;border-radius:6px;
+  padding:8px 16px;font-size:14px;cursor:pointer;font-family:inherit}
+button.btn.sub{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+button.btn.danger{background:#fff;color:#a33;border:1px solid #d9b4b4;padding:3px 9px;font-size:12px}
+button.btn:hover{opacity:.88}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chk{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);
+  border-radius:20px;padding:4px 11px;font-size:13px;cursor:pointer;background:#fff}
+.chk.on{background:var(--accent-w);border-color:var(--accent);color:var(--accent);font-weight:700}
+.chk input{margin:0}
+.hit{font-size:11px;color:var(--warn);background:var(--warn-w);border-radius:10px;
+  padding:1px 7px;margin-left:4px}
+.note{font-size:12px;color:var(--sub)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:#efece4;font-weight:700;white-space:nowrap}
+.bar-row{display:grid;grid-template-columns:150px 1fr 42px;gap:8px;align-items:center;
+  margin-bottom:5px;font-size:13px}
+.bar{background:#eae7de;border-radius:4px;height:16px;overflow:hidden}
+.bar span{display:block;height:100%;background:var(--accent)}
+.bar.low span{background:#c2b8a3}
+.epi{border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin-bottom:8px;background:#fcfbf8}
+.epi .t{font-size:14px;margin-bottom:5px;white-space:pre-wrap}
+.tag{display:inline-block;font-size:11px;background:var(--accent-w);color:var(--accent);
+  border-radius:10px;padding:1px 8px;margin:2px 3px 0 0}
+.tag.g{background:#f0ece1;color:#7a6b47}
+.sug{border-left:4px solid var(--warn);background:var(--warn-w);border-radius:0 8px 8px 0;
+  padding:10px 13px;margin-bottom:10px}
+.sug b{color:var(--warn)}
+.sug ul{margin:5px 0 0;padding-left:20px;font-size:13px}
+.hide{display:none}
+.flexend{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--sub);margin-bottom:10px}
+.stat b{color:var(--ink);font-size:16px}
+#outText{font-family:"Hiragino Mincho ProN",serif;min-height:340px;font-size:13.5px}
+/* 携帯・タブレット。入力欄は16px未満だと iOS が勝手に拡大するため16pxにする */
+@media (max-width: 620px){
+  header{padding:11px 14px}
+  header h1{font-size:15px;line-height:1.4}
+  .tabs{padding:0 6px}
+  .tabs button{flex:1;padding:9px 6px;font-size:13px}
+  main{padding:12px 10px 60px}
+  section.card{padding:13px}
+  input[type=text],input[type=date],input[type=number],select,textarea{font-size:16px}
+  .row>div{min-width:100%}
+  button.btn{padding:11px 18px}
+  .chk{padding:8px 13px;font-size:14px}
+  .bar-row{grid-template-columns:1fr 40px;grid-template-areas:"l l" "b c";gap:3px 8px;margin-bottom:11px}
+  .bar-row>div:nth-child(1){grid-area:l}
+  .bar-row>div:nth-child(2){grid-area:b}
+  .bar-row>div:nth-child(3){grid-area:c;text-align:right}
+  .scrollx{overflow-x:auto}
+  #outText{min-height:260px}
+}
+/* 2026-09 改訂：入力を主役にした帳票画面 */
+body{font-size:16px}
+header{padding:22px max(20px,calc((100vw - 970px)/2))}
+.tabs{position:sticky;top:0;z-index:5;box-shadow:0 3px 12px #183d2414}
+.tabs button{min-height:48px}
+section.card{padding:22px;border-radius:14px;box-shadow:0 3px 14px #183d2406}
+input,textarea,select{scroll-margin-top:80px}
+input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #c78820;outline-offset:3px}
+label,.note{font-size:14px}
+summary{cursor:pointer;color:var(--accent);font-weight:700}
+details[open]>summary{margin-bottom:18px}
+#draftStatus{margin:12px 0;color:var(--accent);font-size:14px}
+#printReport{display:none}
+@media print{
+  header,.tabs,.noprint{display:none!important}
+  body{background:#fff}
+  section.card{border:0;padding:0}
+  #outText{border:0;height:auto}
+  body>header,body>.tabs,body>main{display:none!important}
+  #printReport{display:block!important;white-space:pre-wrap;overflow-wrap:anywhere;font:11pt/1.7 serif;color:#000}
+  @page{size:A4;margin:18mm}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>保育日報 ｜ 幼児期の終わりまでに育ってほしい姿（10の姿）× 5領域</h1>
+  <p>室町幼稚園　※判定は入力語からの補助表示です。最終判断は担任が行ってください</p>
+</header>
+<div class="tabs">
+  <button id="tb1" class="on" onclick="tab(1)">① 日報入力</button>
+  <button id="tb2" onclick="tab(2)">② 分析・提案</button>
+  <button id="tb3" onclick="tab(3)">③ 記録一覧・保存</button>
+</div>
+
+<main>
+<p id="draftStatus" role="status" aria-live="polite"></p>
+<!-- ========== ① 日報入力 ========== -->
+<div id="p1">
+  <div id="bkWarn" class="hide"></div>
+  <section class="card">
+    <details><summary>園の教育理念・教育目標を確認・設定</summary>
+    <p class="note">初期値は<b>令和8年度 重要事項説明書「３ 事業の目的・理念など」の原文</b>です。日報の冒頭に毎回印字されます。文言を変えたときは「保存する」を押してください。</p>
+    <div style="margin-bottom:10px"><label>園名</label><input type="text" id="s_en"></div>
+    <div style="margin-bottom:10px"><label>教育理念</label><textarea id="s_rinen" rows="2"></textarea></div>
+    <div style="margin-bottom:10px"><label>教育方針</label><textarea id="s_hoshin" rows="2"></textarea></div>
+    <div style="margin-bottom:10px"><label>教育目標</label><textarea id="s_goal" rows="2"></textarea></div>
+    <div><label>今学期の重点（任意）</label><textarea id="s_juten" rows="2"></textarea></div>
+    <div class="flexend">
+      <button class="btn" onclick="saveSetting()">保存する</button>
+      <button class="btn sub" onclick="resetSetting()">初期値（重要事項説明書）に戻す</button>
+      <button class="btn sub" onclick="togglePolicy()">教育目標と「提供する教育等の内容」の全文を見る</button>
+    </div>
+    <div id="policyBox" class="hide" style="margin-top:12px"></div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>基本情報</h2>
+    <div class="row">
+      <div><label>日付</label><input type="date" id="f_date"></div>
+      <div><label>クラス</label><input type="text" id="f_class" placeholder="年長ぞう組"></div>
+      <div><label>記録者</label><input type="text" id="f_writer" placeholder="担任名" onchange="saveWriter()"></div>
+      <div><label>天気</label>
+        <select id="f_weather"><option>晴</option><option>曇</option><option>雨</option><option>雪</option></select></div>
+      <div><label>在籍</label><input type="number" id="f_total" min="0"></div>
+      <div><label>出席</label><input type="number" id="f_pres" min="0"></div>
+      <div><label>欠席</label><input type="number" id="f_abs" min="0"></div>
+    </div>
+    <div style="margin-top:10px"><label>主な活動・ねらい</label>
+      <textarea id="f_act" rows="2" placeholder="（例）園庭での砂場遊び／当番活動　※ねらいも一言"></textarea></div>
+  </section>
+
+  <section class="card">
+    <h2>子どもの姿（エピソード記録）</h2>
+    <p class="note">見られた姿を1件ずつ書く → 「自動判定」で候補にチェックが入る → 手で直す → 「この記録を追加」<br>
+      <b>「見たこと」と「読み取り」を分けて記録します。</b>具体的な言葉や行動と、そこから考えたことの両方を残してください。</p>
+    <div class="row" style="margin-bottom:8px">
+      <div><label>活動（しおり「提供する教育等の内容」）</label>
+        <select id="e_act" onchange="showNerai()"></select></div>
+      <div><label>場面（任意）</label>
+        <input type="text" id="e_scene" placeholder="自由遊び／設定保育／給食／降園前 など"></div>
+    </div>
+    <div id="neraiBox" class="hide"></div>
+    <label>① 見たこと（事実）　<span style="color:var(--sub)">— そのとき実際に起きたことだけを書く</span></label>
+    <textarea id="e_fact" rows="3" placeholder="（例）Ａ児が砂場で水路をつくり、水が流れないことに気づいて傾きを変えて3回試していた。Ｂ児を呼んで「こっち掘って」と伝えていた。"></textarea>
+    <label style="margin-top:10px">② 読み取り　<span style="color:var(--sub)">— その姿から何が育っていると考えたか</span></label>
+    <textarea id="e_read" rows="3" placeholder="（例）うまくいかない原因を自分で考え、方法を変えて確かめようとする力が育ってきている。友達に役割を頼む言葉も出るようになった。"></textarea>
+    <div class="flexend">
+      <button class="btn" onclick="autoTag()">自動判定</button>
+      <button class="btn sub" onclick="clearTags()">チェックを全解除</button>
+    </div>
+
+    <h3>10の姿</h3>
+    <div class="chips" id="box_sugata"></div>
+    <div id="skipBox"></div>
+    <h3>5領域（10の姿から自動連動／手動で追加可）</h3>
+    <div class="chips" id="box_ryoiki"></div>
+
+    <div class="flexend">
+      <button class="btn" onclick="addEpisode()">この記録を追加</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>本日の記録（<span id="todayCount">0</span>件）</h2>
+    <div id="todayList"><p class="note">まだ記録がありません。</p></div>
+  </section>
+
+  <section class="card">
+    <h2>振り返り</h2>
+    <div><label>担任の評価・反省</label><textarea id="f_ref" rows="3"></textarea></div>
+    <div style="margin-top:10px"><label>明日への手立て・環境構成</label><textarea id="f_next" rows="3"></textarea></div>
+    <div style="margin-top:10px"><label>連絡・特記事項（けが・保護者対応など）</label><textarea id="f_memo" rows="2"></textarea></div>
+    <div class="flexend"><button class="btn" onclick="buildReport()">日報を書き出す</button></div>
+  </section>
+
+  <section class="card">
+    <h2>日報（印刷・コピー用）</h2>
+    <textarea id="outText" rows="20"></textarea>
+    <div id="envNote1"></div>
+    <div class="flexend noprint">
+      <button class="btn sub" onclick="copyOut()">コピー</button>
+      <button class="btn sub" onclick="doPrint()">印刷 / PDF保存</button>
+      <button class="btn sub" onclick="dlText()">テキスト保存</button>
+    </div>
+  </section>
+</div>
+
+<!-- ========== ② 分析・提案 ========== -->
+<div id="p2" class="hide">
+  <section class="card">
+    <h2>集計期間</h2>
+    <div class="row">
+      <div><label>開始</label><input type="date" id="a_from"></div>
+      <div><label>終了</label><input type="date" id="a_to"></div>
+      <div><label>クラス（空欄=全て）</label><input type="text" id="a_class" placeholder="年長ぞう組"></div>
+    </div>
+    <div class="flexend">
+      <button class="btn" onclick="analyze()">集計する</button>
+      <button class="btn sub" onclick="setRange(7)">直近1週間</button>
+      <button class="btn sub" onclick="setRange(30)">直近1か月</button>
+      <button class="btn sub" onclick="setRange(0)">全期間</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="stat" id="a_stat"></div>
+    <div id="a_cls"></div>
+    <h2>教育目標ごとの記録件数</h2>
+    <p class="note">重要事項説明書に掲げた3つの教育目標が、日々の記録にどれだけ現れているかを示します。</p>
+    <div id="a_goal"></div>
+    <h2 style="margin-top:18px">10の姿の出現状況</h2>
+    <div id="a_sugata"></div>
+    <h2 style="margin-top:18px">5領域のバランス</h2>
+    <div id="a_ryoiki"></div>
+    <h2 style="margin-top:18px">提供する教育等の内容（しおり記載）別の記録件数</h2>
+    <p class="note">保護者に約束している教育内容が、実際の記録に現れているかを確認できます。</p>
+    <div id="a_act"></div>
+  </section>
+
+  <section class="card">
+    <h2>よく見られる姿</h2>
+    <div id="a_top"></div>
+    <h2 style="margin-top:18px">記録が少ない姿と、明日からの手立て</h2>
+    <p class="note">「その姿が育っていない」ではなく「その姿が現れる場面を記録できていない・用意できていない」可能性を示します。</p>
+    <div id="a_low"></div>
+  </section>
+</div>
+
+<!-- ========== ③ 記録一覧 ========== -->
+<div id="p3" class="hide">
+  <section class="card">
+    <h2>データの保存・持ち出し</h2>
+    <p class="note">記録はこのパソコンのブラウザ内に保存されます。バックアップは必ずJSON書き出しを。</p>
+    <div class="flexend">
+      <button class="btn sub" onclick="exportJson()">JSON書き出し（バックアップ）</button>
+      <button class="btn sub" onclick="document.getElementById('imp').click()">JSON読み込み</button>
+      <input type="file" id="imp" accept=".json" class="hide" onchange="importJson(event)">
+      <button class="btn sub" onclick="exportCsv()">CSV書き出し（Excel用）</button>
+    </div>
+    <div id="envNote2"></div>
+
+    <h3>ファイルが使えないとき（携帯・共有ページ）</h3>
+    <p class="note">携帯や共有ページでは、ファイルの保存・選択ができないことがあります。
+      その場合は下のコピー／貼り付けでデータを出し入れしてください。</p>
+    <div class="flexend">
+      <button class="btn sub" onclick="showData()">この端末のデータを表示する</button>
+      <button class="btn sub" onclick="copyData()">まとめてコピー</button>
+      <button class="btn" onclick="pasteImport()">下の内容を読み込む</button>
+    </div>
+    <textarea id="dataBox" rows="5" style="margin-top:8px;font-family:monospace;font-size:12px"
+      placeholder="ここに貼り付けて「下の内容を読み込む」を押します。書き出すときは「この端末のデータを表示する」を押してください。"></textarea>
+  </section>
+  <section class="card">
+    <h2>自動判定の学習状況</h2>
+    <p class="note">自動でチェックされた姿を担任が外すと、その語を覚えます。同じ語で3回外されると、以後その語だけでは自動チェックしません（「見送った候補」には出ます）。</p>
+    <div id="learnBox" class="scrollx"></div>
+    <div class="flexend"><button class="btn sub" onclick="resetLearn()">学習内容をすべて消す</button></div>
+  </section>
+  <section class="card">
+    <h2>全記録（<span id="allCount">0</span>件）</h2>
+    <div class="scrollx"><table id="allTable"></table></div>
+  </section>
+</div>
+</main>
+
+<script>
+/* ===== 定義 ===== */
+const SUGATA = [
+ {id:1,n:"健康な心と体",r:["健康"],
+  kw:["走","登","跳","体を動か","全身","鬼ごっこ","縄跳び","ボール","戸外","汗","食べ","給食","弁当","おかわり","昼寝","午睡","手洗い","うがい","排泄","トイレ","着替え","身支度","生活リズム","安全","危な","けが","靴","健康","丈夫な体","できた"],
+  sug:["朝の会の後に体を十分に動かす時間を固定でとる（かけっこ・リズム遊び）","固定遊具＋巧技台など、挑戦の段階を選べる遊具構成にする","手洗い・着替え・片付けを子ども自身が見通せるよう、絵カードで手順を掲示する"]},
+ {id:2,n:"自立心",r:["健康","人間関係"],
+  kw:["自分で","自分なり","ひとりで","一人で","最後まで","やり遂げ","あきらめ","諦め","挑戦","もう一回","やってみ","片付け","準備","支度","身の回り","当番","頑張","がんば","任せ","選ん","自己肯定","継続的な努力","自分で考え"],
+  sug:["先回りして手伝わず、10秒待ってから声をかける","当番活動に「自分で決める」余地（順番・やり方）を残す","用具を子どもの手の届く高さに置き、出す・戻すを自分で完結できるようにする"]},
+ {id:3,n:"協同性",r:["人間関係"],
+  kw:["一緒に","友達と","力を合わせ","協力","話し合","相談","役割","分担","グループ","チーム","みんなで","共通","誘っ","仲間","手伝っ","一緒","異年齢","年長さん","年少さん","お兄さん","お姉さん","小さい子","ペア","友達を認め","認め合","助け合","協力しあ","育ち合"],
+  sug:["数日かけて完成する共同製作（大型積み木の街・お店屋さん）を設定する","2〜4人でないと成立しない遊具・素材（大型段ボール、綱引き）を用意する","「どうやって決めた？」と過程を全体の場で共有し、話し合いの型を渡す"]},
+ {id:4,n:"道徳性・規範意識の芽生え",r:["人間関係"],
+  kw:["きまり","ルール","約束","順番","譲","ゆず","貸して","交代","いけない","だめ","謝","ごめん","我慢","がまん","折り合い","気持ちを考え","相手の気持ち","仲直り","トラブル","けんか","公平","ずるい","思いやり","譲り合","尊重"],
+  sug:["トラブルを止めるのではなく、双方の言い分を言葉にする時間をとる","遊具の使い方のきまりを子どもと一緒に決め直し、掲示する","絵本や紙芝居で「どうすればよかった？」を考える機会をつくる"]},
+ {id:5,n:"社会生活との関わり",r:["人間関係","環境"],
+  kw:["地域","高齢者","お年寄り","消防","警察","郵便","お店","買い物","園外","散歩","小学生","小学校","来園","施設","公共","役に立","お客さん","招待","教会","礼拝","手紙","呉服神社","商店街","地域の方","消防署","郵便局"],
+  sug:["園外散歩でお店や働く人に挨拶し、気づきを帰園後に共有する","異年齢・小学校との交流の機会を年間計画に位置づける","地域の方（お年寄り・卒園生）を招く場を設け、役割をもって関わる"]},
+ {id:6,n:"思考力の芽生え",r:["環境"],
+  kw:["なぜ","どうして","不思議","気づ","気付","比べ","くらべ","試し","ためし","予想","工夫","考え","確かめ","発見","うまくいか","失敗","別の方法","仕組み","なんで","もっと","だったら","五感","遊びこ","遊び込","集中","自己解決","判断","よく見","よく考え","興味関心","探求","追求"],
+  sug:["すぐ答えを教えず「どうしてだと思う？」と問い返す","うまくいかない素材（水・斜面・重さ）をあえて置き、試行の余地を残す","子どもの発見を写真で掲示し、翌日の遊びにつなげる"]},
+ {id:7,n:"自然との関わり・生命尊重",r:["環境"],
+  kw:["虫","だんごむし","ダンゴムシ","ちょう","蝶","かたつむり","バッタ","花","草","葉","木","どんぐり","種","芽","水やり","栽培","野菜","収穫","飼育","うさぎ","金魚","生き物","いのち","命","死","天気","雨","風","雪","氷","土","泥","自然","太陽","空","東山","五月山","猪名川","もみじ公園","ゴリランド","秀望台","たけのこ","きんかん","ゆず","キウイ","やまもも","ブラックベリー","さくらんぼ","収穫","木登り","落ち葉","川"],
+  sug:["栽培・飼育の世話当番を継続し、変化を記録する掲示をつくる","虫や草花の図鑑・虫めがねを子どもが取れる場所に常設する","死や弱った生き物の場面を避けず、皆で考える時間にする"]},
+ {id:8,n:"数量や図形、標識や文字などへの関心・感覚",r:["環境","言葉"],
+  kw:["数","かず","数え","何個","何人","量","大きい","小さい","長さ","重さ","形","まる","さんかく","三角","四角","図形","時計","時間","カレンダー","標識","マーク","文字","ひらがな","名前を書","看板","地図","順番に並","計っ","はかり"],
+  sug:["出欠・給食の数を子どもが数えて伝える役割をつくる","積み木・パターンブロックなど形を扱う素材を常設する","持ち物やロッカーに文字とマークを併記し、必要感のある形で文字に触れる"]},
+ {id:9,n:"言葉による伝え合い",r:["言葉"],
+  kw:["話し","伝え","聞い","質問","答え","説明","発表","言葉で","やりとり","会話","絵本","物語","紙芝居","言い合","つぶや","呼び","教えて","どうぞ","ありがとう","なりきり","セリフ","聴いて","伝え合","コミュニケーション","よく聞"],
+  sug:["朝の会で「昨日の遊びの続き」を子どもが話す時間を固定する","保育者が子どもの言葉を言い換えて返し、語彙を渡す","絵本の後に「この後どうなる？」と話す場をつくる"]},
+ {id:10,n:"豊かな感性と表現",r:["表現"],
+  kw:["歌","うた","踊","おどり","リズム","楽器","太鼓","合奏","絵","描","かい","製作","作っ","つくっ","粘土","色","きれい","美し","心を動か","ごっこ","劇","イメージ","飾","素敵","わあ","リトミック","音楽","絵画","茶道","表現する"],
+  sug:["描く・作る素材（廃材・自然物）を選べる形で棚に常設する","子どもの作品を壊さず数日残し、続きができるようにする","音楽・リズム遊びを日課に入れ、感じたことを体で表す機会をつくる"]}
+];
+const RYOIKI = ["健康","人間関係","環境","言葉","表現"];
+const RY_KW = {
+ "健康":["体","運動","食","睡眠","安全","清潔"],
+ "人間関係":["友達","関わ","一緒","きまり","地域"],
+ "環境":["自然","素材","数","形","文字","不思議"],
+ "言葉":["話","言葉","絵本","伝え"],
+ "表現":["歌","絵","製作","踊","ごっこ"]
+};
+
+/* 提供する教育等の内容（令和8年度改訂 入園のしおり P3 の記載に基づく）
+   nerai は しおり本文の要約。s は そのねらいが主に対応する10の姿。 */
+const ACT = [
+ {n:"通常保育", nerai:"", s:[]},
+ {n:"野外活動（東山ほか）",
+  nerai:"年間を通した野外での自然体験活動。五感をフルに使って自分のやりたいことを見つけて遊びこみ、継続した遊びや学びへとつながるよう、自然の中で共にのびのびと育ちあえる環境を整える。",
+  s:[1,6,7]},
+ {n:"異年齢活動",
+  nerai:"異年齢活動を通して、思いやりのある豊かな心と丈夫な体を育てる。",
+  s:[1,3,4]},
+ {n:"リトミック指導",
+  nerai:"教え込む教育法ではなく、音楽を通して「聴いて考えて表現する」ことを大切にし、自分で考える力・表現する力・友達を認める力・コミュニケーション能力・判断力・理解力・自己解決力・集中力などの非認知能力を育てる（専任講師）。",
+  s:[3,6,9,10]},
+ {n:"体操指導（コスモ）",
+  nerai:"楽しく体を動かしながら、たくさんの「できた！」を経験できるようにする。体操を通して諦めない気持ちや友だちを想う気持ちなど、人間力の向上をねらいとする（体育専任講師）。",
+  s:[1,2,3]},
+ {n:"英語指導",
+  nerai:"ネイティブの先生との交流をし、楽しく身体を動かし、遊びを通して英語に親しみが持てるようにする。",
+  s:[5,9,10]},
+ {n:"絵画指導",
+  nerai:"絵画の専任講師による絵画指導（年1回）。",
+  s:[10]},
+ {n:"茶道教室",
+  nerai:"茶道の専任講師による指導（年1回・年中・年長対象）。",
+  s:[4,5,10]},
+ {n:"園庭開放・その他", nerai:"", s:[]}
+];
+
+/* 教育目標（令和8年度 重要事項説明書「３ 事業の目的・理念など」原文）
+   s は その目標が主に対応する10の姿。 */
+const GOALS = [
+ {t:"よく見、よく聞き、よく考える",
+  d:"学びある環境作りに尽力し、子どもたちが安全にのびのびと活動できる場を大切にする。また、何事にも興味関心を持ち、自分で考え行動し継続的な努力ができる子どもの育成に励む。",
+  s:[2,6,9]},
+ {t:"一人ひとりの個性を大切に、互いに認め合い尊重しあう",
+  d:"一人ひとりの言動や考えを大切に、取り組もうとしている意図や過程を考察し、自己肯定感を育む。",
+  s:[2,3,4]},
+ {t:"自然の中でのびのびと共に育ち合う",
+  d:"園外に出かけ四季折々の自然の中で五感を使って遊び込み、友だちとの関わりを広げながら思いやりの心と助け合い協力しあう気持ちを育む。",
+  s:[1,3,7]}
+];
+const CLASSES = ["ばら組","ゆり組","きく組","ふじ組（預かり保育）","すみれ組（未就園児）","ちゅうりっぷ組（未就園児）"];
+const LUNCH = {1:"米飯給食",2:"米飯給食",3:"お弁当",4:"米飯給食",5:"お弁当"};
+
+/* ===== 状態 ===== */
+/* 枠の中に埋め込まれて表示されているか（共有ページはこの形）。
+   この場合、ファイル保存・印刷・クリップボードが黙って効かないことがある。 */
+const EMBEDDED = (() => { try { return window.self !== window.top; } catch(e) { return true; } })();
+
+/* 文字列を画面に出して手で取り出してもらう。最後の逃げ道。 */
+function offerText(txt, what){
+  tab(3);
+  $("dataBox").value = txt;
+  $("dataBox").scrollIntoView({behavior:"smooth", block:"center"});
+  alert("この画面では" + what + "を保存できませんでした。\n" +
+        "下の枠に内容を出しました。長押しまたは右クリックでコピーして、\n" +
+        "メールやメモに貼り付けて保管してください。");
+}
+/* クリップボードは環境によって使えない。使える方法を順に試す。 */
+async function copyText(t, okMsg){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(t);
+      alert(okMsg); return true;
+    }
+  }catch(e){ /* 下の方法を試す */ }
+  try{
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    if(ok){ alert(okMsg); return true; }
+  }catch(e){ /* 手でコピーしてもらう */ }
+  return false;
+}
+function doPrint(){
+  if(!$("outText").value.trim()){
+    alert("先に「日報を書き出す」を押してください。"); return;
+  }
+  try{ $("printReport").textContent = $("outText").value; window.print(); }
+  catch(e){
+    alert("この画面からは印刷できませんでした。\n" +
+          "「コピー」を押して、メモ帳などに貼り付けてから印刷してください。");
+  }
+}
+
+/* 保存領域のラッパー。サンドボックスやブラウザ設定で localStorage が
+   例外を投げる環境でも、画面が動く状態を保つ（記録は保存されない）。 */
+const store = (() => {
+  let ok = false;
+  try {
+    localStorage.setItem("__probe", "1");
+    localStorage.removeItem("__probe");
+    ok = true;
+  } catch(e) { ok = false; }
+  const mem = {};
+  return {
+    get ok(){ return ok; },
+    get(k){ try { return ok ? localStorage.getItem(k) : (k in mem ? mem[k] : null); }
+            catch(e){ return k in mem ? mem[k] : null; } },
+    set(k, v){ try { if(ok) localStorage.setItem(k, v); else mem[k] = String(v); }
+               catch(e){ ok = false; mem[k] = String(v); }
+               return ok; },
+    del(k){ try { if(ok) localStorage.removeItem(k); else delete mem[k]; }
+            catch(e){ delete mem[k]; } }
+  };
+})();
+/* 保存された値が壊れていても既定値で動き続ける */
+function safeParse(raw, fallback){
+  try { const v = JSON.parse(raw); return v === null ? fallback : v; }
+  catch(e) { return fallback; }
+}   // 解錠済みかどうか（ブラウザを閉じると戻る）
+
+let DB = safeParse(store.get("nippo10"), []);
+/* 初期値は令和8年度 重要事項説明書「３ 事業の目的・理念など」の原文 */
+const SET_DEF = {
+  en:"学校法人 室町学園　室町幼稚園",
+  rinen:"「豊かな心・丈夫な体ですくすくと」を教育理念とし、園児の心身の健やかな育成に貢献します。",
+  hoshin:"創立の精神「幼児教育こそ教育の原点」を継承し、情操教育の向上、追求心・探求心を持った自律性ある子どもの育成に努める。",
+  goal:GOALS.map((g,i)=>`${"①②③"[i]}${g.t}`).join("　"),
+  juten:""
+};
+let SET = Object.assign({}, SET_DEF, safeParse(store.get("nippo10set"), {}));
+let today = [];
+const save = () => store.set("nippo10", JSON.stringify(DB));
+const $ = id => document.getElementById(id);
+const esc = s => (s||"").replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+/* 初期化はスクリプト末尾で行う（後方で定義する定数を参照するため） */
+
+function saveWriter(){ store.set("nippo10writer", $("f_writer").value.trim()); }
+
+
+/* 月末バックアップの促し。書き出さないまま記録がたまるのを防ぐ */
+function checkBackup(){
+  const last = store.get("nippo10bk"), b = $("bkWarn");
+  const days = last ? Math.floor((Date.now() - +last) / 86400000) : null;
+  let msg = "";
+  if(DB.length >= 5 && days === null)
+    msg = `記録が${DB.length}件たまっていますが、<b>一度もバックアップされていません。</b>`;
+  else if(days !== null && days >= 14)
+    msg = `前回のバックアップから<b>${days}日</b>経っています。`;
+  if(!msg){ b.classList.add("hide"); return; }
+  b.classList.remove("hide");
+  b.innerHTML = `<div class="sug" style="margin-bottom:14px">
+    <b>バックアップのお願い</b>　${msg}
+    このツールの記録はこのパソコンの中にしかありません。履歴を消すと全部消えます。
+    <div style="margin-top:6px"><button class="btn" onclick="tab(3)">③記録一覧・保存タブを開く</button></div></div>`;
+}
+
+function saveSetting(){
+  ["en","goal","rinen","hoshin","juten"].forEach(k => SET[k] = $("s_"+k).value.trim());
+  store.set("nippo10set", JSON.stringify(SET));
+  alert("保存しました。次回からこの内容が日報に印字されます。");
+}
+function resetSetting(){
+  if(!confirm("重要事項説明書の原文に戻します。よろしいですか？")) return;
+  SET = Object.assign({}, SET_DEF, {juten:SET.juten});
+  ["en","goal","rinen","hoshin","juten"].forEach(k => $("s_"+k).value = SET[k] || "");
+  store.set("nippo10set", JSON.stringify(SET));
+}
+function togglePolicy(){ $("policyBox").classList.toggle("hide"); }
+function showNerai(){
+  const a = ACT[+$("e_act").value], b = $("neraiBox");
+  if(!a.nerai){ b.classList.add("hide"); return; }
+  b.classList.remove("hide");
+  b.innerHTML = `<div class="sug" style="border-left-color:var(--accent);background:var(--accent-w);margin-bottom:10px">
+    <b>この活動のねらい（入園のしおり）</b><div style="font-size:13px">${a.nerai}</div>
+    <div style="margin-top:5px;font-size:12px">「自動判定」を押すと、このねらいに対応する
+      ${a.s.map(id=>`<span class="tag">${id}.${SUGATA.find(s=>s.id===id).n}</span>`).join("")} も候補に入ります。</div></div>`;
+}
+
+function tab(n){
+  [1,2,3].forEach(i => { $("p"+i).classList.toggle("hide", i!==n); $("tb"+i).classList.toggle("on", i===n); });
+  if(n===2) analyze();
+  if(n===3) renderAll();
+}
+function mark(cb){ cb.closest(".chk").classList.toggle("on", cb.checked); }
+
+/* ===== 自動判定 =====
+   1. 文を読点・句点で区切り、語が出てきた区切りの中に否定表現があるかを見る
+   2. 否定されていた語は自動でチェックせず、「見送った候補」として理由つきで並べる
+   3. 担任が外した判定は覚えておき、3回外された語では自動チェックしない        */
+
+/* 「危ない」「少ない」などの形容詞を誤検出しないよう、動詞の否定形だけを並べる */
+const NEG = /(なかった|なかっ|ませんでした|ません|できず|できない|しない|しなかった|られない|られず|ずに|ず[、。]|ようとしない|わけではない|ないまま)/;
+/* 否定されることでむしろその姿を示す語（諦めなかった＝自立心） */
+const NEG_POS = ["諦め","あきらめ","投げ出","泣か","嫌がら"];
+const REJECT_LIMIT = 3;
+
+let LEARN = safeParse(store.get("nippo10learn"), {});
+let lastAuto = {};   // 直前の自動判定でチェックした {姿id: [根拠の語]}
+let lastActIds = []; // 活動のねらい由来（学習の対象にしない）
+
+const inputText = () => ($("e_fact").value + "。" + $("e_read").value).trim();
+const clausesOf = t => t.split(/[、。\n]/).map(x=>x.trim()).filter(Boolean);
+
+/* 各姿について、肯定的に出てきた語と否定文脈で出てきた語に分ける */
+function judge(text){
+  const cls = clausesOf(text), res = {};
+  SUGATA.forEach(s => {
+    const pos = [], neg = [];
+    s.kw.forEach(k => cls.forEach(c => {
+      if(!c.includes(k)) return;
+      const flip = NEG_POS.some(p => k.includes(p));
+      const box = (NEG.test(c) && !flip) ? neg : pos;
+      if(!box.includes(k)) box.push(k);
+    }));
+    if(pos.length || neg.length) res[s.id] = { pos, neg };
+  });
+  return res;
+}
+const rejected = (id, k) => (LEARN[id + "|" + k] || 0) >= REJECT_LIMIT;
+
+function autoTag(){
+  const t = inputText();
+  if(!$("e_fact").value.trim()){ alert("「① 見たこと（事実）」を入力してください。"); return; }
+  clearTags();
+  const res = judge(t), skip = [];
+  lastAuto = {};
+
+  Object.keys(res).map(Number).forEach(id => {
+    const { pos, neg } = res[id];
+    const use = pos.filter(k => !rejected(id, k));
+    const name = SUGATA.find(s => s.id === id).n;
+    if(use.length){
+      const cb = document.querySelector(`#cs${id} input`);
+      cb.checked = true; mark(cb);
+      const h = $("hit"+id);
+      h.textContent = use.slice(0,4).join("・"); h.classList.remove("hide");
+      lastAuto[id] = use;
+    } else if(neg.length){
+      skip.push([id, name, `「${neg.join("・")}」が否定表現とともに出てきたため`]);
+    } else if(pos.length){
+      skip.push([id, name, `「${pos.join("・")}」は以前この姿から外されたため`]);
+    }
+  });
+
+  lastActIds = ACT[+$("e_act").value].s;
+  lastActIds.forEach(id => {
+    const cb = document.querySelector(`#cs${id} input`);
+    cb.checked = true; mark(cb);
+    const h = $("hit"+id);
+    h.textContent = (h.classList.contains("hide") ? "" : h.textContent + "・") + "活動のねらい";
+    h.classList.remove("hide");
+  });
+
+  $("skipBox").innerHTML = skip.length ? `<div class="sug" style="margin-top:8px">
+      <b>見送った候補</b>（あてはまるなら押して追加してください）
+      ${skip.map(([id,n,why]) => `<div style="margin-top:5px;font-size:13px">
+        <button class="btn sub" style="padding:2px 10px;font-size:12px"
+          onclick="addSugata(${id})">${id}. ${n} を追加</button>
+        <span class="note">　${why}</span></div>`).join("")}
+    </div>` : "";
+
+  syncRyoiki();
+  RYOIKI.forEach(r => { if((RY_KW[r]||[]).some(k => t.includes(k))) setRyoiki(r, true); });
+  if(!getSugata().length && !skip.length)
+    alert("該当する語が見つかりませんでした。手動でチェックしてください。");
+}
+function addSugata(id){
+  const cb = document.querySelector(`#cs${id} input`);
+  cb.checked = true; mark(cb); syncRyoiki();
+}
+/* 自動でチェックしたのに担任が外した語を覚える（活動のねらい由来は対象外） */
+function learnFromEdit(){
+  const final = getSugata();
+  Object.keys(lastAuto).map(Number)
+    .filter(id => !final.includes(id) && !lastActIds.includes(id))
+    .forEach(id => lastAuto[id].forEach(k => {
+      const key = id + "|" + k; LEARN[key] = (LEARN[key] || 0) + 1;
+    }));
+  store.set("nippo10learn", JSON.stringify(LEARN));
+  lastAuto = {}; lastActIds = [];
+}
+function clearTags(){
+  document.querySelectorAll("#box_sugata input,#box_ryoiki input").forEach(cb => { cb.checked=false; mark(cb); });
+  SUGATA.forEach(s => { const h = $("hit"+s.id); h.textContent=""; h.classList.add("hide"); });
+  $("skipBox").innerHTML = "";
+}
+function getSugata(){ return [...document.querySelectorAll("#box_sugata input:checked")].map(c => +c.value); }
+function getRyoiki(){ return [...document.querySelectorAll("#box_ryoiki input:checked")].map(c => c.value); }
+function setRyoiki(r, v){
+  const cb = [...document.querySelectorAll("#box_ryoiki input")].find(c => c.value===r);
+  if(cb){ cb.checked = v || cb.checked; mark(cb); }
+}
+function syncRyoiki(){
+  getSugata().forEach(id => SUGATA.find(s=>s.id===id).r.forEach(r => setRyoiki(r,true)));
+}
+
+/* ===== エピソード ===== */
+function addEpisode(){
+  if(!$("f_date").value || !$("f_class").value.trim()){
+    alert("日付とクラスを入力してください。"); return;
+  }
+  const fact = $("e_fact").value.trim(), read = $("e_read").value.trim();
+  if(!fact){ alert("「① 見たこと（事実）」を入力してください。"); return; }
+  if(!read && !confirm("「② 読み取り」が空です。観察した事実だけで保存しますか？")) return;
+  const s = getSugata();
+  if(!s.length && !confirm("10の姿が未選択です。このまま追加しますか？")) return;
+  learnFromEdit();
+  const rec = { date:$("f_date").value, cls:$("f_class").value.trim(), scene:$("e_scene").value.trim(),
+    who:$("f_writer").value.trim(),
+    act:ACT[+$("e_act").value].n, fact:fact, read:read, sugata:s, ryoiki:getRyoiki(), ts:Date.now() };
+  DB.push(rec); today.push(rec); save();
+  $("e_fact").value=""; $("e_read").value=""; $("e_scene").value=""; clearTags();
+  renderToday(); checkBackup(); saveDraft(); renderAll();
+}
+/* 旧形式（text 1本）の記録も読めるようにする */
+const factOf = e => e.fact !== undefined ? e.fact : (e.text || "");
+const readOf = e => e.read || "";
+function renderToday(){
+  today = DB.filter(e => e.date === $("f_date").value && e.cls === $("f_class").value.trim());
+  $("todayCount").textContent = today.length;
+  $("todayList").innerHTML = today.length ? today.map((e,i)=>`
+    <div class="epi">
+      <div class="t">${esc((e.act&&e.act!=="通常保育"?`《${e.act}》`:"")+(e.scene?`【${e.scene}】`:""))}${esc(factOf(e))}</div>
+      ${readOf(e) ? `<div class="t" style="color:var(--accent);font-size:13px">▸ 読み取り：${esc(readOf(e))}</div>` : ""}
+      ${e.sugata.map(id=>`<span class="tag">${id}.${SUGATA.find(s=>s.id===id).n}</span>`).join("")}
+      ${e.ryoiki.map(r=>`<span class="tag g">${r}</span>`).join("")}
+      <div style="margin-top:6px"><button class="btn danger" onclick="delToday(${i})">削除</button></div>
+    </div>`).join("") : '<p class="note">まだ記録がありません。</p>';
+}
+function delToday(i){
+  const r = today[i];
+  if(!confirm("この記録を削除します。よろしいですか？")) return;
+  DB = DB.filter(x => x.ts !== r.ts); today.splice(i,1); save(); renderToday();
+}
+
+/* ===== 日報出力 ===== */
+function buildReport(){
+  renderToday();
+  const d = $("f_date").value, L = [];
+  const wd = d ? "（"+"日月火水木金土"[new Date(d).getDay()]+"）" : "";
+  L.push(SET.en || "");
+  L.push("　　　　　　　　保 育 日 報");
+  L.push("");
+  if(SET.rinen)  L.push("【教育理念】" + SET.rinen);
+  if(SET.hoshin) L.push("【教育方針】" + SET.hoshin);
+  if(SET.goal)   L.push("【教育目標】" + SET.goal);
+  if(SET.juten)  L.push("【今学期の重点】" + SET.juten);
+  L.push("―".repeat(28));
+  const lunch = d ? (LUNCH[new Date(d).getDay()] || "―") : "―";
+  L.push(`日付：${d}${wd}　　天気：${$("f_weather").value}　　クラス：${$("f_class").value}　　昼食：${lunch}`);
+  L.push(`記録者：${$("f_writer").value || "　　　　　　"}`);
+  L.push(`在籍 ${$("f_total").value||"―"}名 ／ 出席 ${$("f_pres").value||"―"}名 ／ 欠席 ${$("f_abs").value||"―"}名`);
+  L.push("―".repeat(28));
+  L.push("■ 主な活動・ねらい");
+  L.push($("f_act").value || "（記載なし）");
+  L.push("");
+  L.push("■ 子どもの姿と読み取り");
+  if(today.length){
+    today.forEach((e,i) => {
+      L.push(`${i+1}）${e.act&&e.act!=="通常保育"?`《${e.act}》`:""}${e.scene?`【${e.scene}】`:""}`);
+      L.push(`　　〔見たこと〕${factOf(e)}`);
+      if(readOf(e)) L.push(`　　〔読み取り〕${readOf(e)}`);
+      L.push(`　　○10の姿：${e.sugata.map(id=>`${id}.${SUGATA.find(s=>s.id===id).n}`).join("／")||"―"}`);
+      L.push(`　　○5領域：${e.ryoiki.join("／")||"―"}`);
+      L.push("");
+    });
+  } else { L.push("（記載なし）"); L.push(""); }
+  const cs = {}, cr = {};
+  today.forEach(e => { e.sugata.forEach(id=>cs[id]=(cs[id]||0)+1); e.ryoiki.forEach(r=>cr[r]=(cr[r]||0)+1); });
+  L.push("■ 本日の記録の内訳");
+  L.push("　10の姿：" + (Object.keys(cs).length ? Object.entries(cs).sort((a,b)=>b[1]-a[1])
+      .map(([id,c])=>`${id}.${SUGATA.find(s=>s.id==id).n}(${c})`).join("　") : "―"));
+  L.push("　5領域　：" + (RYOIKI.filter(r=>cr[r]).map(r=>`${r}(${cr[r]})`).join("　") || "―"));
+  L.push("　教育目標：" + GOALS.map((g,i) =>
+    `${"①②③"[i]}(${today.filter(e=>e.sugata.some(id=>g.s.includes(id))).length})`).join("　"));
+  L.push("");
+  L.push("■ 担任の評価・反省");
+  L.push($("f_ref").value || "（記載なし）");
+  L.push("");
+  L.push("■ 明日への手立て・環境構成");
+  L.push($("f_next").value || "（記載なし）");
+  L.push("");
+  L.push("■ 連絡・特記事項");
+  L.push($("f_memo").value || "（記載なし）");
+  L.push("");
+  L.push("担任　　　　　　　　主任　　　　　　　　園長　　　　　　　");
+  $("outText").value = L.join("\n");
+  $("outText").scrollIntoView({behavior:"smooth"});
+}
+async function copyOut(){
+  if(!await copyText($("outText").value, "日報をコピーしました。"))
+    alert("自動でコピーできませんでした。日報の枠を長押し（右クリック）してコピーしてください。");
+}
+function dlText(){ dl($("outText").value, `${$("f_date").value}_保育日報_${$("f_class").value||"クラス"}.txt`, "text/plain"); }
+/* ファイルの保存。共有ページでは通常の保存が効かないため、
+   その環境が用意している保存の仕組みがあればそちらを使う。 */
+async function dl(txt, name, type){
+  const data = type === "text/csv" ? "﻿" + txt : txt;   // BOMはExcel対策。JSONには付けない
+  try{
+    const d = (typeof claude !== "undefined" && claude.use) ? await claude.use("downloads") : null;
+    if(d){ await d.save({ filename: name, data }); return true; }
+  }catch(e){
+    const c = e && e.code;
+    if(c === "declined") return false;
+    if(c === "extension_not_enabled" || c === "rejected_extension"){
+      alert("この画面ではこの形式で保存できません。\n「まとめてコピー」を使うか、園のパソコンから書き出してください。");
+      return false;
+    }
+    if(c === "too_large"){ alert("データが大きすぎて保存できません。事務担当に連絡してください。"); return false; }
+    /* それ以外は下の通常の方法を試す */
+  }
+  /* 枠の中では <a download> が黙って無視されるため、画面に出す */
+  if(EMBEDDED){ offerText(txt, name); return false; }
+  try{
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([data], {type:type+";charset=utf-8"}));
+    a.download = name; a.click();
+    return true;
+  }catch(e){
+    offerText(txt, name);
+    return false;
+  }
+}
+
+/* ===== 分析 ===== */
+function setRange(days){
+  const p = n => String(n).padStart(2,"0"), f = d => `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  const to = new Date();
+  $("a_to").value = f(to);
+  if(days===0){ const ds = DB.map(r=>r.date).filter(Boolean).sort(); $("a_from").value = ds[0] || f(to); }
+  else { const from = new Date(); from.setDate(to.getDate()-days+1); $("a_from").value = f(from); }
+  analyze();
+}
+function analyze(){
+  const from = $("a_from").value, to = $("a_to").value, cls = $("a_class").value.trim();
+  const rows = DB.filter(r => (!from||r.date>=from) && (!to||r.date<=to) && (!cls||(r.cls||"").includes(cls)));
+  const cs = {}, cr = {};
+  SUGATA.forEach(s => cs[s.id]=0); RYOIKI.forEach(r => cr[r]=0);
+  rows.forEach(e => { (e.sugata||[]).forEach(id=>cs[id]++); (e.ryoiki||[]).forEach(r=>{if(r in cr)cr[r]++}); });
+  const days = new Set(rows.map(r=>r.date)).size;
+  const withRead = rows.filter(e => readOf(e)).length;
+  $("a_stat").innerHTML = `<div>記録日数 <b>${days}</b> 日</div><div>エピソード <b>${rows.length}</b> 件</div>
+    <div>1日平均 <b>${days?(rows.length/days).toFixed(1):"0.0"}</b> 件</div>
+    <div>読み取りの記入率 <b>${rows.length?Math.round(withRead/rows.length*100):0}</b> %</div>`;
+  /* 複数クラスのデータを読み込んで園全体を見るとき用 */
+  const byCls = {};
+  rows.forEach(e => { const k = e.cls || "（クラス未記入）"; byCls[k] = (byCls[k]||0)+1; });
+  const clsKeys = Object.keys(byCls).sort((a,b)=>byCls[b]-byCls[a]);
+  $("a_cls").innerHTML = clsKeys.length > 1
+    ? `<div class="scrollx"><table style="margin-bottom:14px"><tr><th>クラス</th>${clsKeys.map(k=>`<th>${esc(k)}</th>`).join("")}</tr>
+       <tr><td>記録件数</td>${clsKeys.map(k=>`<td>${byCls[k]}</td>`).join("")}</tr></table></div>`
+    : "";
+
+  const cg = GOALS.map(g => rows.filter(e => (e.sugata||[]).some(id => g.s.includes(id))).length);
+  const gmax = Math.max(1, ...cg);
+  $("a_goal").innerHTML = GOALS.map((g,i) => `
+    <div class="bar-row"><div title="${g.d}">${"①②③"[i]} ${g.t.length>16?g.t.slice(0,16)+"…":g.t}</div>
+      <div class="bar ${cg[i]<=gmax*0.25?"low":""}"><span style="width:${Math.round(cg[i]/gmax*100)}%"></span></div>
+      <div>${cg[i]}</div></div>`).join("")
+    + `<p class="note">対応する10の姿：${GOALS.map((g,i)=>`${"①②③"[i]} ${g.s.join("・")}`).join("　／　")}
+       　※5.社会生活との関わり／8.数量・図形・文字／10.豊かな感性と表現 は、3つの教育目標の文言に直接は含まれません。10の姿のグラフで別途確認してください。</p>`;
+
+  const max = Math.max(1, ...Object.values(cs));
+  $("a_sugata").innerHTML = SUGATA.map(s => {
+    const c = cs[s.id], w = Math.round(c/max*100);
+    return `<div class="bar-row"><div>${s.id}. ${s.n}</div>
+      <div class="bar ${c<=max*0.25?"low":""}"><span style="width:${w}%"></span></div><div>${c}</div></div>`;
+  }).join("");
+  const rmax = Math.max(1, ...Object.values(cr));
+  $("a_ryoiki").innerHTML = RYOIKI.map(r => {
+    const c = cr[r];
+    return `<div class="bar-row"><div>${r}</div>
+      <div class="bar ${c<=rmax*0.25?"low":""}"><span style="width:${Math.round(c/rmax*100)}%"></span></div><div>${c}</div></div>`;
+  }).join("");
+
+  const ca = {};
+  ACT.forEach(a => ca[a.n] = 0);
+  rows.forEach(e => { if(e.act in ca) ca[e.act]++; });
+  const amax = Math.max(1, ...Object.values(ca));
+  $("a_act").innerHTML = ACT.map(a => {
+    const c = ca[a.n];
+    return `<div class="bar-row"><div>${a.n}</div>
+      <div class="bar ${c===0?"low":""}"><span style="width:${Math.round(c/amax*100)}%"></span></div><div>${c}</div></div>`;
+  }).join("");
+  const zero = ACT.filter(a => a.nerai && ca[a.n]===0).map(a => a.n);
+  if(zero.length && rows.length) $("a_act").innerHTML +=
+    `<p class="note" style="color:var(--warn)">この期間に記録が0件の教育内容：${zero.join("／")}
+     　※実施日がなかったのか、実施したが記録していないのかを確認してください。</p>`;
+
+  if(!rows.length){
+    $("a_top").innerHTML = '<p class="note">この期間の記録がありません。</p>';
+    $("a_low").innerHTML = ""; return;
+  }
+  const sorted = SUGATA.map(s=>({...s, c:cs[s.id]})).sort((a,b)=>b.c-a.c);
+  $("a_top").innerHTML = "<ul>" + sorted.slice(0,3).map(s =>
+    `<li><b>${s.id}. ${s.n}</b>（${s.c}件）── 関連領域：${s.r.join("・")}</li>`).join("") + "</ul>"
+    + '<p class="note">ここは日々の保育で十分に手が届いている部分です。学期末の要録・保護者面談で具体例として使えます。</p>';
+  const low = sorted.slice().reverse().slice(0,3);
+  $("a_low").innerHTML = low.map(s => {
+    const rel = ACT.filter(a => a.s.includes(s.id));
+    const rg = GOALS.map((g,i)=>({g,i})).filter(x => x.g.s.includes(s.id));
+    return `<div class="sug"><b>${s.id}. ${s.n}</b>（${s.c}件／関連領域：${s.r.join("・")}）
+      ${rg.length ? `<div style="font-size:12.5px;margin-top:3px">教育目標
+        <b>${rg.map(x=>`${"①②③"[x.i]}${x.g.t}`).join("／")}</b> に直接かかわる姿です。</div>` : ""}
+      ${rel.length ? `<div style="font-size:12.5px;margin-top:3px">園の教育内容では
+        <b>${rel.map(a=>a.n).join("・")}</b> のねらいに含まれます（記録件数：${rel.map(a=>`${a.n} ${ca[a.n]}件`).join("／")}）</div>` : ""}
+      <ul>${s.sug.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+  }).join("")
+    + `<p class="note">※提案は幼稚園教育要領の各領域の内容に沿った一般的な手立てです。園の実情に合わせて取捨してください。</p>`;
+}
+
+/* ===== 一覧・入出力 ===== */
+function renderLearn(){
+  const rows = Object.entries(LEARN).filter(([,c]) => c > 0)
+    .sort((a,b) => b[1]-a[1]).slice(0,30);
+  $("learnBox").innerHTML = rows.length
+    ? `<table><tr><th>語</th><th>外された姿</th><th>回数</th><th>状態</th></tr>` + rows.map(([k,c]) => {
+        const [id, kw] = k.split("|");
+        return `<tr><td>${esc(kw)}</td><td>${id}. ${SUGATA.find(s=>s.id==id).n}</td><td>${c}</td>
+          <td>${c >= REJECT_LIMIT ? "自動チェックしない" : `あと${REJECT_LIMIT-c}回で停止`}</td></tr>`;
+      }).join("") + "</table>"
+    : '<p class="note">まだ学習した内容はありません。</p>';
+}
+function resetLearn(){
+  if(!confirm("自動判定の学習内容をすべて消します。よろしいですか？")) return;
+  LEARN = {}; store.del("nippo10learn"); renderLearn();
+}
+function renderAll(){
+  $("allCount").textContent = DB.length;
+  renderLearn();
+  const query = ($("recordSearch")?.value || "").trim().toLocaleLowerCase();
+  const rows = DB.filter(e => [e.date,e.cls,e.who,e.act,e.scene,factOf(e),readOf(e)].join(" ").toLocaleLowerCase().includes(query))
+    .sort((a,b)=> (b.date||"").localeCompare(a.date||"") || b.ts-a.ts);
+  if($("searchCount")) $("searchCount").textContent = `${rows.length}件を表示 / 全${DB.length}件`;
+  $("allTable").innerHTML = "<tr><th>日付</th><th>クラス</th><th>記録者</th><th>活動</th><th>場面</th><th>子どもの姿</th><th>10の姿</th><th>領域</th><th></th></tr>"
+    + (rows.length ? rows.map(e=>`<tr>
+        <td>${esc(e.date)}</td><td>${esc(e.cls)}</td><td>${esc(e.who)}</td><td>${esc(e.act)}</td><td>${esc(e.scene)}</td>
+        <td style="min-width:260px">${esc(factOf(e))}${readOf(e)?`<div style="color:var(--accent);margin-top:3px">▸ ${esc(readOf(e))}</div>`:""}</td>
+        <td>${(e.sugata||[]).join("・")}</td><td>${(e.ryoiki||[]).join("・")}</td>
+        <td><button class="btn danger" onclick="delRec(${e.ts})">削除</button></td></tr>`).join("")
+      : '<tr><td colspan="9">該当する記録がありません。</td></tr>');
+}
+function delRec(ts){
+  if(!confirm("この記録を削除します。よろしいですか？")) return;
+  DB = DB.filter(r=>r.ts!==ts); today = today.filter(r=>r.ts!==ts); save(); renderAll(); renderToday();
+}
+/* 園の命名ルール YYYYMMDD_種別_件名_宛先 に合わせる */
+function fname(ext){
+  const d = ($("f_date").value || "").replace(/-/g,"");
+  const c = ($("f_class").value.trim() || "全クラス").replace(/[\/\\:*?"<>|]/g,"");
+  return `${d}_日報_保育記録データ_${c}.${ext}`;
+}
+async function exportJson(){
+  if(await dl(JSON.stringify(DB,null,1), fname("json"), "application/json")){
+    store.set("nippo10bk", Date.now()); checkBackup();
+  }
+}
+function exportCsv(){
+  const h = ["日付","クラス","記録者","活動","場面","見たこと（事実）","読み取り","10の姿","5領域"];
+  const q = s => `"${String(s||"").replace(/"/g,'""')}"`;
+  const body = DB.map(e => [e.date,e.cls,e.who,e.act,e.scene,factOf(e),readOf(e),
+    (e.sugata||[]).map(id=>`${id}.${SUGATA.find(s=>s.id===id).n}`).join("／"),
+    (e.ryoiki||[]).join("／")].map(q).join(","));
+  dl([h.join(","),...body].join("\n"), fname("csv"), "text/csv");
+}
+/* 取り込みの本体。ファイルからでも貼り付けからでも同じ処理を通す */
+function mergeText(text, source){
+  let d;
+  try { d = JSON.parse(text); } catch(e) { d = null; }
+  if(!Array.isArray(d)){
+    alert("読み込めませんでした。" + source + "の内容が正しくないようです。");
+    return false;
+  }
+  const seen = new Set(DB.map(x => x.ts));
+  const valid = x => x && typeof x === "object" && Number.isSafeInteger(x.ts)
+    && typeof x.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(x.date)
+    && typeof x.cls === "string" && typeof (x.fact ?? x.text) === "string"
+    && ["read","who","scene","act"].every(k => x[k] === undefined || typeof x[k] === "string")
+    && Array.isArray(x.sugata) && x.sugata.every(id => Number.isInteger(id) && id>=1 && id<=10)
+    && Array.isArray(x.ryoiki) && x.ryoiki.every(r => RYOIKI.includes(r));
+  if(!d.every(valid)){
+    alert("形式の合わない記録が含まれています。読み込みを中止しました。現在の記録は変更していません。"); return false;
+  }
+  const add = d.filter(x => { if(seen.has(x.ts)) return false; seen.add(x.ts); return true; });
+  DB = DB.concat(add); save(); renderAll(); renderToday();
+  alert(`${add.length}件を追加しました（重複は除外）。`);
+  return true;
+}
+function importJson(ev){
+  const f = ev.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = () => { mergeText(r.result, "ファイル"); ev.target.value = ""; };
+  r.readAsText(f);
+}
+/* 携帯や共有ページではファイルの保存ができないため、文字として出す */
+function showData(){
+  $("dataBox").value = JSON.stringify(DB);
+  $("dataBox").scrollIntoView({behavior:"smooth", block:"center"});
+}
+async function copyData(){
+  showData();
+  const t = $("dataBox");
+  t.select(); t.setSelectionRange(0, t.value.length);
+  if(await copyText(t.value, `${DB.length}件をコピーしました。メールやメモに貼り付けて保管してください。`)){
+    store.set("nippo10bk", Date.now()); checkBackup();
+  } else {
+    alert("自動でコピーできませんでした。枠の中を長押しして「コピー」を選んでください。");
+  }
+}
+function pasteImport(){
+  const t = $("dataBox").value.trim();
+  if(!t){ alert("枠に貼り付けてから押してください。"); return; }
+  if(mergeText(t, "貼り付けた内容")) $("dataBox").value = "";
+}
+/* 入力途中も、この端末の下書きとして残す。記録一覧とは別に保存する。 */
+const DRAFT_FIELDS = ["f_date","f_class","f_writer","f_weather","f_total","f_pres","f_abs","f_act","f_ref","f_next","f_memo","e_act","e_scene","e_fact","e_read","outText"];
+function saveDraft(){
+  const fields = Object.fromEntries(DRAFT_FIELDS.map(id => [id,$(id).value]));
+  const saved = store.set("nippo10draft", JSON.stringify({fields,sugata:getSugata(),ryoiki:getRyoiki()}));
+  $("draftStatus").textContent = saved ? "下書きをこの端末に保存しました" : "この画面では保存できません。閉じる前に内容をコピーしてください。";
+}
+function restoreDraft(){
+  const draft = safeParse(store.get("nippo10draft"), null);
+  if(!draft || !draft.fields) return;
+  DRAFT_FIELDS.forEach(id => { if(typeof draft.fields[id] === "string") $(id).value = draft.fields[id]; });
+  (draft.sugata||[]).forEach(id => { const cb = document.querySelector(`#cs${Number(id)} input`); if(cb){cb.checked=true;mark(cb);} });
+  (draft.ryoiki||[]).forEach(r => setRyoiki(r,true));
+  $("draftStatus").textContent = "前回の下書きを復元しました";
+  showNerai();
+}
+/* ===== 初期化（すべての定義が済んだあとに実行する） ===== */
+(function init(){
+  const d = new Date(), p = n => String(n).padStart(2,"0");
+  $("f_date").value = `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  $("box_sugata").innerHTML = SUGATA.map(s =>
+    `<label class="chk" id="cs${s.id}"><input type="checkbox" value="${s.id}" onchange="syncRyoiki();mark(this)">${s.id}. ${s.n}<span class="hit hide" id="hit${s.id}"></span></label>`).join("");
+  $("box_ryoiki").innerHTML = RYOIKI.map(r =>
+    `<label class="chk"><input type="checkbox" value="${r}" onchange="mark(this)">${r}</label>`).join("");
+  $("e_act").innerHTML = ACT.map((a,i)=>`<option value="${i}">${a.n}</option>`).join("");
+  ["en","goal","rinen","hoshin","juten"].forEach(k => $("s_"+k).value = SET[k] || "");
+  $("f_class").setAttribute("list","clsList");
+  $("f_class").insertAdjacentHTML("afterend",
+    `<datalist id="clsList">${CLASSES.map(c=>`<option value="${c}">`).join("")}</datalist>`);
+  $("policyBox").innerHTML =
+    '<h3 style="margin-top:0">教育目標（重要事項説明書 原文）</h3>'
+    + GOALS.map((g,i) => `<div class="sug" style="border-left-color:var(--accent);background:var(--accent-w)">
+        <b>${"①②③"[i]} ${g.t}</b><div style="font-size:13px">${g.d}</div>
+        <div style="margin-top:4px">${g.s.map(id=>`<span class="tag">${id}.${SUGATA.find(s=>s.id===id).n}</span>`).join("")}</div>
+      </div>`).join("")
+    + '<h3>提供する教育等の内容（入園のしおり P3）</h3>'
+    + ACT.filter(a=>a.nerai).map(a =>
+    `<div class="sug" style="border-left-color:var(--accent);background:var(--accent-w)">
+       <b>${a.n}</b><div style="font-size:13px">${a.nerai}</div>
+       <div style="margin-top:4px">${a.s.map(id=>`<span class="tag">${id}.${SUGATA.find(s=>s.id===id).n}</span>`).join("")}</div>
+     </div>`).join("")
+    + '<p class="note">出典：令和8年度 重要事項説明書／令和8年度改訂 入園のしおり P3。10の姿への対応は各文言から整理したものです。</p>';
+  $("f_writer").value = store.get("nippo10writer") || "";
+  restoreDraft();
+  document.body.insertAdjacentHTML("beforeend", '<pre id="printReport"></pre>');
+  $("allTable").parentElement.insertAdjacentHTML("beforebegin", '<label for="recordSearch">記録を検索</label><input id="recordSearch" type="search" placeholder="クラス・記録者・エピソードから検索" style="width:100%;padding:12px;font:inherit"><p id="searchCount" class="note" role="status"></p>');
+  $("recordSearch").addEventListener("input",renderAll);
+  document.querySelectorAll("label").forEach(label => {
+    const field = label.nextElementSibling;
+    if(field?.matches("input,textarea,select") && field.id) label.htmlFor = field.id;
+  });
+  document.addEventListener("input", ev => {
+    if(DRAFT_FIELDS.includes(ev.target.id)){ saveDraft(); if(["f_date","f_class"].includes(ev.target.id)) renderToday(); }
+  });
+  document.addEventListener("change", ev => {
+    if(ev.target.closest("#box_sugata,#box_ryoiki") || DRAFT_FIELDS.includes(ev.target.id)) saveDraft();
+  });
+  window.addEventListener("pagehide",saveDraft);
+  setRange(30);
+  renderToday(); renderAll(); checkBackup();
+  if(EMBEDDED){
+    const msg = `<p class="note" style="margin-top:8px">この画面（共有ページ）では、
+      保存・印刷・コピーが使えないことがあります。うまくいかないときは
+      <b>③タブの「この端末のデータを表示する」</b>で内容を画面に出して、
+      手でコピーしてください。</p>`;
+    $("envNote1").innerHTML = msg;
+    $("envNote2").innerHTML = msg;
+  }
+  if(!store.ok){
+    $("bkWarn").classList.remove("hide");
+    $("bkWarn").innerHTML = `<div class="sug" style="margin-bottom:14px">
+      <b>この環境では記録を保存できません</b>　ブラウザの設定か表示方法の制限で、保存領域が使えません。
+      入力しても、画面を閉じると消えます。<br>
+      ファイルをパソコンに保存してから開き直すか、事務担当に連絡してください。</div>`;
+  }
+})();
+</script>
+</body>
+</html>
