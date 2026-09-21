@@ -179,7 +179,9 @@ details[open]>summary{margin-bottom:18px}
     <div class="flexend">
       <button class="btn" onclick="autoTag()">自動判定</button>
       <button class="btn sub" onclick="clearTags()">チェックを全解除</button>
+      <button class="btn sub" onclick="registerSelection()">選んだ言葉を辞書に登録</button>
     </div>
+    <div id="wordBox"></div>
 
     <h3>10の姿</h3>
     <div class="chips" id="box_sugata"></div>
@@ -281,6 +283,13 @@ details[open]>summary{margin-bottom:18px}
     </div>
     <textarea id="dataBox" rows="5" style="margin-top:8px;font-family:monospace;font-size:12px"
       placeholder="ここに貼り付けて「下の内容を読み込む」を押します。書き出すときは「この端末のデータを表示する」を押してください。"></textarea>
+  </section>
+  <section class="card">
+    <h2>判定できなかった言い回し</h2>
+    <p class="note">担任が手でチェックした姿について、判定に使われていない言葉を集めています。
+      園でよく使う言い回しを辞書に加えると、次から自動で拾えるようになります。
+      <b>記録の文章は一切変わりません。</b>辞書だけが育ちます。</p>
+    <div id="vocabBox" class="scrollx"></div>
   </section>
   <section class="card">
     <h2>自動判定の学習状況</h2>
@@ -533,6 +542,32 @@ const NEG_POS = ["諦め","あきらめ","投げ出","泣か","嫌がら"];
 const REJECT_LIMIT = 3;
 
 let LEARN = safeParse(store.get("hoiku-demo-v3:learn"), {});
+/* 園の言い回しを辞書に育てるための2つ。
+   ADDKW = 担任が承認して判定に使う追加語  VOCAB = 承認待ちの候補と出現回数 */
+let ADDKW = safeParse(store.get("hoiku-demo-v3:addkw"), {});
+let VOCAB = safeParse(store.get("hoiku-demo-v3:vocab"), {});
+const VOCAB_MIN = 2;   // 2回以上出てきた語だけを候補に見せる
+
+/* その姿の判定に使う語（元の辞書＋承認された追加語） */
+function kwOf(s){ return s.kw.concat(ADDKW[s.id] || []); }
+
+/* 判定の手がかりになりにくい、どの記録にも出る語は候補にしない */
+const STOP = ["子ども","こども","園児","先生","保育","保育者","担任","今日","本日","午前","午後",
+              "様子","場面","以上","とき","こと","もの","ため","ところ","A児","B児","C児"];
+
+/* 本文から辞書の候補語を拾う。漢字・カタカナのまとまりだけを見る。
+   ひらがなは語の切れ目が判定できず（「むろまちひろ」のように途中で切れる）、
+   辞書を壊すので自動では拾わない。ひらがなの言い回しは
+   担任が範囲を選んで registerSelection() で登録する。 */
+function candidateWords(text){
+  const out = [];
+  (text.match(/[一-龥ヶ々]{2,5}|[ァ-ヴー]{3,8}/g) || []).forEach(w => {
+    if(STOP.includes(w)) return;
+    if(SUGATA.some(s => kwOf(s).some(k => k.includes(w) || w.includes(k)))) return;
+    if(!out.includes(w)) out.push(w);
+  });
+  return out;
+}
 let lastAuto = {};   // 直前の自動判定でチェックした {姿id: [根拠の語]}
 let lastActIds = []; // 活動のねらい由来（学習の対象にしない）
 
@@ -544,7 +579,7 @@ function judge(text){
   const cls = clausesOf(text), res = {};
   SUGATA.forEach(s => {
     const pos = [], neg = [];
-    s.kw.forEach(k => cls.forEach(c => {
+    kwOf(s).forEach(k => cls.forEach(c => {
       if(!c.includes(k)) return;
       const flip = NEG_POS.some(p => k.includes(p));
       const box = (NEG.test(c) && !flip) ? neg : pos;
@@ -599,12 +634,75 @@ function autoTag(){
 
   syncRyoiki();
   RYOIKI.forEach(r => { if((RY_KW[r]||[]).some(k => t.includes(k))) setRyoiki(r, true); });
-  if(!getSugata().length && !skip.length)
-    alert("該当する語が見つかりませんでした。手動でチェックしてください。");
+  if(!getSugata().length && !skip.length) showHints();
+}
+/* 何も判定されなかったとき、どの言葉なら拾えるかを示す。
+   文章を書き換えるのではなく、担任が自分で判断して書き足すための手がかり。 */
+/* 担任が本文中で範囲選択した言い回しを、指定した姿の判定語として登録する。
+   自動抽出できないひらがなの言い回しを取り込むための入口。 */
+function registerSelection(){
+  let w = "";
+  ["e_fact","e_read"].forEach(id => {
+    const t = $(id);
+    if(document.activeElement === t || (t.selectionStart !== t.selectionEnd && !w))
+      w = t.value.slice(t.selectionStart, t.selectionEnd);
+  });
+  w = w.replace(/["'\\`]/g, "").trim();
+  if(w.length < 2 || w.length > 12){
+    alert("辞書に登録したい言葉を、本文の中で2〜12文字だけ選んでから押してください。\n" +
+          "（例）「ひきうけて」を選ぶ → 2.自立心 の手がかりとして登録");
+    return;
+  }
+  if(SUGATA.some(s => kwOf(s).includes(w))){ alert(`「${w}」はすでに辞書にあります。`); return; }
+  $("wordBox").innerHTML = `<div class="sug" style="margin-top:8px">
+    <b>「${esc(w)}」をどの姿の手がかりにしますか？</b>
+    <div style="font-size:12.5px;margin-top:3px">選んだ姿の判定に、この言葉が使われるようになります。
+      記録の文章は変わりません。</div>
+    <div class="chips" style="margin-top:6px">${SUGATA.map(s =>
+      `<button class="btn sub" style="padding:5px 11px;font-size:12.5px"
+        onclick="addWord(${s.id},'${esc(w)}')">${s.id}. ${s.n}</button>`).join("")}</div>
+    <div class="flexend"><button class="btn danger" onclick="$('wordBox').innerHTML=''">やめる</button></div>
+  </div>`;
+  $("wordBox").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function addWord(id, w){
+  ADDKW[id] = (ADDKW[id] || []);
+  if(!ADDKW[id].includes(w)) ADDKW[id].push(w);
+  store.set("hoiku-demo-v3:addkw", JSON.stringify(ADDKW));
+  $("wordBox").innerHTML = `<p class="note" style="color:var(--accent)">
+    「${esc(w)}」を ${id}. ${SUGATA.find(s=>s.id===id).n} の手がかりとして登録しました。
+    次の記録から自動で拾われます。取り消しは③タブから。</p>`;
+  renderVocab();
+}
+function showHints(){
+  const ex = s => kwOf(s).filter(k => k.length >= 2).slice(0, 4).join("』『");
+  $("skipBox").innerHTML = `<div class="sug" style="margin-top:8px">
+    <b>どの姿も自動では拾えませんでした</b>
+    <div style="font-size:13px;margin-top:4px">下のチェックを手で付けてください。
+      判定はあくまで入力の補助です。拾われなくても記録の価値は変わりません。</div>
+    <div style="font-size:13px;margin-top:8px">参考：次のような言葉があると自動で拾えます。
+      <b style="color:var(--warn)">実際にその場面があったときだけ書いてください。
+      判定に合わせるために、見ていないことを書き足さないでください。</b></div>
+    <ul style="font-size:12.5px;margin-top:5px">
+      ${SUGATA.map(s => `<li>${s.id}. ${s.n} … 『${ex(s)}』</li>`).join("")}
+    </ul></div>`;
 }
 function addSugata(id){
   const cb = document.querySelector(`#cs${id} input`);
   cb.checked = true; mark(cb); syncRyoiki();
+}
+/* 自動では拾えなかったのに担任がチェックした姿について、
+   本文中の未登録語を候補として貯める。判定されない言い回しを辞書に取り込むため。 */
+function collectVocab(){
+  const auto = Object.keys(lastAuto).map(Number);
+  const added = getSugata().filter(id => !auto.includes(id) && !lastActIds.includes(id));
+  if(!added.length) return;
+  const words = candidateWords(inputText());
+  added.forEach(id => words.forEach(w => {
+    const key = id + "|" + w;
+    VOCAB[key] = (VOCAB[key] || 0) + 1;
+  }));
+  store.set("hoiku-demo-v3:vocab", JSON.stringify(VOCAB));
 }
 /* 自動でチェックしたのに担任が外した語を覚える（活動のねらい由来は対象外） */
 function learnFromEdit(){
@@ -620,7 +718,7 @@ function learnFromEdit(){
 function clearTags(){
   document.querySelectorAll("#box_sugata input,#box_ryoiki input").forEach(cb => { cb.checked=false; mark(cb); });
   SUGATA.forEach(s => { const h = $("hit"+s.id); h.textContent=""; h.classList.add("hide"); });
-  $("skipBox").innerHTML = "";
+  $("skipBox").innerHTML = ""; $("wordBox").innerHTML = "";
 }
 function getSugata(){ return [...document.querySelectorAll("#box_sugata input:checked")].map(c => +c.value); }
 function getRyoiki(){ return [...document.querySelectorAll("#box_ryoiki input:checked")].map(c => c.value); }
@@ -642,6 +740,7 @@ function addEpisode(){
   if(!read && !confirm("「② 読み取り」が空です。観察した事実だけで保存しますか？")) return;
   const s = getSugata();
   if(!s.length && !confirm("10の姿が未選択です。このまま追加しますか？")) return;
+  collectVocab();
   learnFromEdit();
   const rec = { date:$("f_date").value, cls:$("f_class").value.trim(), scene:$("e_scene").value.trim(),
     who:$("f_writer").value.trim(),
@@ -848,6 +947,50 @@ function analyze(){
 }
 
 /* ===== 一覧・入出力 ===== */
+/* 承認待ちの候補を出す。担任が「加える」を押した語だけが判定に使われる。 */
+function renderVocab(){
+  const rows = Object.entries(VOCAB).filter(([,c]) => c >= VOCAB_MIN)
+    .sort((a,b) => b[1]-a[1]).slice(0,40);
+  const added = Object.entries(ADDKW).flatMap(([id,ws]) => ws.map(w => [id,w]));
+  let html = "";
+  html += rows.length
+    ? `<table><tr><th>言葉</th><th>この姿に使う</th><th>回数</th><th></th></tr>` + rows.map(([k,c]) => {
+        const i = k.indexOf("|"), id = k.slice(0,i), w = k.slice(i+1);
+        return `<tr><td>${esc(w)}</td><td>${id}. ${SUGATA.find(s=>s.id==id).n}</td><td>${c}</td>
+          <td style="white-space:nowrap">
+            <button class="btn sub" style="padding:2px 9px;font-size:12px"
+              onclick="approveWord('${esc(k)}')">辞書に加える</button>
+            <button class="btn danger" onclick="dropWord('${esc(k)}')">見送る</button></td></tr>`;
+      }).join("") + "</table>"
+    : `<p class="note">まだ候補はありません（同じ言葉が${VOCAB_MIN}回出てくると、ここに並びます）。</p>`;
+  if(added.length){
+    html += `<h3>辞書に加えた言葉（${added.length}件）</h3><table>`
+      + `<tr><th>言葉</th><th>この姿に使う</th><th></th></tr>`
+      + added.map(([id,w]) => `<tr><td>${esc(w)}</td><td>${id}. ${SUGATA.find(s=>s.id==id).n}</td>
+          <td><button class="btn danger" onclick="removeWord('${id}','${esc(w)}')">取り消す</button></td></tr>`).join("")
+      + "</table>";
+  }
+  $("vocabBox").innerHTML = html;
+}
+function approveWord(key){
+  const i = key.indexOf("|"), id = key.slice(0,i), w = key.slice(i+1);
+  ADDKW[id] = (ADDKW[id] || []).concat(ADDKW[id] && ADDKW[id].includes(w) ? [] : [w]);
+  delete VOCAB[key];
+  store.set("hoiku-demo-v3:addkw", JSON.stringify(ADDKW));
+  store.set("hoiku-demo-v3:vocab", JSON.stringify(VOCAB));
+  renderVocab();
+}
+function dropWord(key){
+  delete VOCAB[key];
+  store.set("hoiku-demo-v3:vocab", JSON.stringify(VOCAB));
+  renderVocab();
+}
+function removeWord(id, w){
+  ADDKW[id] = (ADDKW[id] || []).filter(x => x !== w);
+  if(!ADDKW[id].length) delete ADDKW[id];
+  store.set("hoiku-demo-v3:addkw", JSON.stringify(ADDKW));
+  renderVocab();
+}
 function renderLearn(){
   const rows = Object.entries(LEARN).filter(([,c]) => c > 0)
     .sort((a,b) => b[1]-a[1]).slice(0,30);
@@ -865,7 +1008,7 @@ function resetLearn(){
 }
 function renderAll(){
   $("allCount").textContent = DB.length;
-  renderLearn();
+  renderLearn(); renderVocab();
   const query = ($("recordSearch")?.value || "").trim().toLocaleLowerCase();
   const rows = DB.filter(e => [e.date,e.cls,e.who,e.act,e.scene,factOf(e),readOf(e)].join(" ").toLocaleLowerCase().includes(query))
     .sort((a,b)=> (b.date||"").localeCompare(a.date||"") || b.ts-a.ts);
