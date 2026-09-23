@@ -44,6 +44,8 @@ button.btn:hover{opacity:.88}
 .chk{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);
   border-radius:20px;padding:4px 11px;font-size:13px;cursor:pointer;background:#fff}
 .chk.on{background:var(--accent-w);border-color:var(--accent);color:var(--accent);font-weight:700}
+button.btn.sub.on{background:var(--accent);color:#fff}
+button.chipbtn{padding:7px 14px;font-size:13px;border-radius:20px}
 .chk input{margin:0}
 .hit{font-size:11px;color:var(--warn);background:var(--warn-w);border-radius:10px;
   padding:1px 7px;margin-left:4px}
@@ -82,6 +84,7 @@ th{background:#efece4;font-weight:700;white-space:nowrap}
   .row>div{min-width:100%}
   button.btn{padding:11px 18px}
   .chk{padding:8px 13px;font-size:14px}
+  button.chipbtn{padding:11px 16px;font-size:14px}   /* 指で押せる高さにする */
   .bar-row{grid-template-columns:1fr 40px;grid-template-areas:"l l" "b c";gap:3px 8px;margin-bottom:11px}
   .bar-row>div:nth-child(1){grid-area:l}
   .bar-row>div:nth-child(2){grid-area:b}
@@ -147,7 +150,7 @@ details[open]>summary{margin-bottom:18px}
   </section>
 
   <section class="card">
-    <h2>基本情報</h2>
+    <details id="baseBox"><summary id="baseSummary">基本情報</summary>
     <div class="row">
       <div><label>日付</label><input type="date" id="f_date"></div>
       <div><label>クラス</label><input type="text" id="f_class" placeholder="年長ぞう組"></div>
@@ -155,28 +158,33 @@ details[open]>summary{margin-bottom:18px}
       <div><label>天気</label>
         <select id="f_weather"><option>晴</option><option>曇</option><option>雨</option><option>雪</option></select></div>
       <div><label>在籍</label><input type="number" id="f_total" min="0"></div>
-      <div><label>出席</label><input type="number" id="f_pres" min="0"></div>
       <div><label>欠席</label><input type="number" id="f_abs" min="0"></div>
+      <div><label>出席（自動）</label><input type="number" id="f_pres" min="0"></div>
     </div>
+    <p class="note" id="presNote">在籍と欠席を入れると、出席は自動で計算します。直接書き換えても構いません。</p>
     <div style="margin-top:10px"><label>主な活動・ねらい</label>
       <textarea id="f_act" rows="2" placeholder="（例）園庭での砂場遊び／当番活動　※ねらいも一言"></textarea></div>
+    </details>
   </section>
 
   <section class="card">
     <h2>子どもの姿（エピソード記録）</h2>
     <p class="note">見られた姿を1件ずつ書く → 「自動判定」で候補にチェックが入る → 手で直す → 「この記録を追加」<br>
-      <b>「見たこと」と「読み取り」を分けて記録します。</b>具体的な言葉や行動と、そこから考えたことの両方を残してください。</p>
+      <b>「見たこと」と「読み取り」を分けて記録します。</b>具体的な言葉や行動と、そこから考えたことの両方を残してください。<br>
+      <b>Ctrl（Macは⌘）＋ Enter</b> でも追加できます。追加すると続けて次を書けます。</p>
     <div class="row" style="margin-bottom:8px">
       <div><label>活動（しおり「提供する教育等の内容」）</label>
         <select id="e_act" onchange="showNerai()"></select></div>
       <div><label>場面（任意）</label>
         <input type="text" id="e_scene" placeholder="自由遊び／設定保育／給食／降園前 など"></div>
     </div>
+    <div class="chips" id="sceneChips" style="margin-bottom:10px"></div>
     <div id="neraiBox" class="hide"></div>
     <label>① 見たこと（事実）　<span style="color:var(--sub)">— そのとき実際に起きたことだけを書く</span></label>
     <textarea id="e_fact" rows="3" placeholder="（例）Ａ児が砂場で水路をつくり、水が流れないことに気づいて傾きを変えて3回試していた。Ｂ児を呼んで「こっち掘って」と伝えていた。"></textarea>
     <label style="margin-top:10px">② 読み取り　<span style="color:var(--sub)">— その姿から何が育っていると考えたか</span></label>
     <textarea id="e_read" rows="3" placeholder="（例）うまくいかない原因を自分で考え、方法を変えて確かめようとする力が育ってきている。友達に役割を頼む言葉も出るようになった。"></textarea>
+    <div class="chips" id="readChips" style="margin-top:6px"></div>
     <div class="flexend">
       <button class="btn" onclick="autoTag()">自動判定</button>
       <button class="btn sub" onclick="clearTags()">チェックを全解除</button>
@@ -638,6 +646,56 @@ function autoTag(){
    文章を書き換えるのではなく、担任が自分で判断して書き足すための手がかり。 */
 /* 担任が本文中で範囲選択した言い回しを、指定した姿の判定語として登録する。
    自動抽出できないひらがなの言い回しを取り込むための入口。 */
+/* よく使う場面。押すと場面欄に入り、もう一度押すと外れる */
+const SCENES = ["自由遊び","設定保育","戸外遊び","給食","午睡","当番活動","朝の会","降園前","園外"];
+/* 読み取りの型。「〜」の部分を担任が書く。手が止まるのを防ぐためだけのもので、
+   文をつなげると活用が崩れるため、型ごと差し込んで「〜」を選択状態にする */
+const READ_TAILS = ["〜しようとしている。","〜が育ってきている。","〜に気づき始めている。",
+                    "〜を自分なりに考えている。","〜を楽しんでいる。"];
+
+function renderInputHelpers(){
+  $("sceneChips").innerHTML = SCENES.map(v =>
+    `<button class="btn sub chipbtn" onclick="pickScene('${v}')">${v}</button>`).join("");
+  $("e_scene").addEventListener("input", markScene);
+  $("readChips").innerHTML =
+    '<span class="note" style="width:100%">言い回しに迷ったとき（押すと型が入り、「〜」を書き換えられます）</span>'
+    + READ_TAILS.map(v =>
+        `<button class="btn sub chipbtn" onclick="appendTail('${v}')">${v}</button>`).join("");
+}
+function pickScene(v){
+  const el = $("e_scene");
+  el.value = (el.value.trim() === v) ? "" : v;
+  markScene(); saveDraft();
+}
+/* いま選ばれている場面のボタンを目立たせる */
+function markScene(){
+  const cur = $("e_scene").value.trim();
+  [...$("sceneChips").children].forEach(b =>
+    b.classList.toggle("on", b.textContent === cur));
+}
+function appendTail(v){
+  const el = $("e_read");
+  const head = el.value.replace(/\s+$/, "");
+  const sep = head && !/[。、]$/.test(head) ? "。" : "";
+  const start = (head + sep).length;
+  el.value = head + sep + v;
+  el.focus();
+  el.setSelectionRange(start, start + 1);   // 「〜」を選んだ状態にして、そのまま上書きできるようにする
+  saveDraft();
+}
+/* 在籍と欠席から出席を出す。手で直した場合はその値を尊重する */
+function calcPresent(){
+  const t = parseInt($("f_total").value, 10), a = parseInt($("f_abs").value, 10);
+  if(Number.isInteger(t) && Number.isInteger(a) && t >= a) $("f_pres").value = t - a;
+}
+/* 折りたたんだ基本情報の中身を見出しに出す。開かなくても中身が分かるように */
+function updateBaseSummary(){
+  const d = $("f_date").value, c = $("f_class").value.trim(), w = $("f_weather").value;
+  const p = $("f_pres").value, a = $("f_abs").value;
+  $("baseSummary").textContent = (d || c)
+    ? `基本情報：${d}　${c || "クラス未記入"}　${w}` + (p ? `　出席${p}／欠席${a || 0}` : "")
+    : "基本情報（日付・クラスを入れてください）";
+}
 function registerSelection(){
   let w = "";
   ["e_fact","e_read"].forEach(id => {
@@ -744,8 +802,11 @@ function addEpisode(){
     who:$("f_writer").value.trim(),
     act:ACT[+$("e_act").value].n, fact:fact, read:read, sugata:s, ryoiki:getRyoiki(), ts:Date.now() };
   DB.push(rec); today.push(rec); save();
-  $("e_fact").value=""; $("e_read").value=""; $("e_scene").value=""; clearTags();
+  $("e_fact").value=""; $("e_read").value=""; clearTags();   // 場面は続けて使うので残す
   renderToday(); checkBackup(); saveDraft(); renderAll();
+  updateBaseSummary();
+  $("e_fact").focus();
+  $("e_fact").scrollIntoView({behavior:"smooth", block:"center"});
 }
 /* 旧形式（text 1本）の記録も読めるようにする */
 const factOf = e => e.fact !== undefined ? e.fact : (e.text || "");
@@ -1134,7 +1195,21 @@ function restoreDraft(){
      </div>`).join("")
     + '<p class="note">出典：令和8年度 重要事項説明書／令和8年度改訂 入園のしおり P3。10の姿への対応は各文言から整理したものです。</p>';
   $("f_writer").value = store.get("nippo10writer") || "";
+  renderInputHelpers();
   restoreDraft();
+  markScene();
+  updateBaseSummary();
+  ["f_total","f_abs"].forEach(id => $(id).addEventListener("input", () => {
+    calcPresent(); updateBaseSummary(); saveDraft();
+  }));
+  ["f_date","f_class","f_weather","f_pres"].forEach(id =>
+    $(id).addEventListener("input", updateBaseSummary));
+  /* 日付とクラスが入っていれば基本情報は畳んでおく。毎日使うのはエピソード欄なので */
+  $("baseBox").open = !($("f_date").value && $("f_class").value.trim());
+  /* Ctrl / Cmd + Enter で記録を追加 */
+  ["e_fact","e_read","e_scene"].forEach(id => $(id).addEventListener("keydown", ev => {
+    if((ev.metaKey || ev.ctrlKey) && ev.key === "Enter"){ ev.preventDefault(); addEpisode(); }
+  }));
   document.body.insertAdjacentHTML("beforeend", '<pre id="printReport"></pre>');
   $("allTable").parentElement.insertAdjacentHTML("beforebegin", '<label for="recordSearch">記録を検索</label><input id="recordSearch" type="search" placeholder="クラス・記録者・エピソードから検索" style="width:100%;padding:12px;font:inherit"><p id="searchCount" class="note" role="status"></p>');
   $("recordSearch").addEventListener("input",renderAll);
